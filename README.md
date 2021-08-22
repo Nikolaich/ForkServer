@@ -1,5 +1,5 @@
 # ForkServer
-ForkServer for ForkPlayer<br>**(betta testing status)**
+ForkServer for ForkPlayer<br>**(For testing purposes only!)**
 
 ### Run options: ###
 *program* **[command]** **[options]**<br>
