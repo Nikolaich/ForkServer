@@ -25,7 +25,7 @@ http://{ServerIP}:{ServerPort}**[/path]**
 **/test.json** - stata in json-format<br>
 **/parserlink?{parsing_command}** - used by ForkPlayer parsing<br>
 **/proxy.m3u8?link={url_of_m3u8}[&header={{Name}:{value}}...]** - "proxy" the m.3u8 list<br>
-**/torrserve[?link={url_of_torrent_or_magnet}][&shuffle=true]** - shows the playlist of the torrent content<br>
+**/torrserve[?link={url_of_torrent_or_magnet}[&shuffle=true]]** - shows the playlist of the torrent content<br>
 **/treeview** - main playlist<br>
 **/treeview/[path][?shuffle=true]** - media files playlist<br>
 **/set?Torrserve=search&search={addr}** - sets Torrserve address<br>
