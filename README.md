@@ -1,7 +1,7 @@
 # ForkServer
 ForkServer for ForkPlayer<br>**(For testing purposes only!)**
 
-### Run options: ###
+### Run options:
 *program* **[command]** **[options]**<br>
 - where **[command]** (_for **windows** only, for other OS it is ignored_) is one of:<br>
 **install** - installs and runs it as service (service name: **ForkServer**)<br>
@@ -17,7 +17,7 @@ ForkServer for ForkPlayer<br>**(For testing purposes only!)**
 
 *server logs errors to STDERR, info to STDOUT (**for windows service, it logs to the files: errors.log and info.log**)
 
-### HTTP API: ###
+### HTTP API:
 http://{ServerIP}:{ServerPort}**[/path]**
 - where **[/paht]** can be one of:<br>
 **/** - web ui (*in progress*)<br>
