@@ -27,7 +27,7 @@ http://{ServerIP}:{ServerPort}**[/path]**
 **/proxy.m3u8?link={url_of_m3u8}&[header={request_header}...]** - "proxy" the m.3u8 list<br>
 **/torrserve[?link={url_of_torrent_or_magnet}][&shuffle=true]** - shows the playlist of the torrent content<br>
 **/treeview** - main playlist<br>
-**/treeview/[path]** - media files playlist<br>
+**/treeview/[path][?shuffle=true]** - media files playlist<br>
 **/set?Torrserve=search&search={addr}** - sets Torrserve address<br>
 **/restart** - restarts the server<br>
 **/udpate** - check the updates and install them if exists<br>
