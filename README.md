@@ -30,6 +30,6 @@ http://{ServerIP}:{ServerPort}**[/path]**
 **/treeview/[path][?shuffle=true]** - media files playlist<br>
 **/set?Torrserve=search&search={addr}** - sets Torrserve address<br>
 **/restart** - restarts the server<br>
-**/udpate** - check the updates and install them if exists<br>
-**/{pic}.svg**- show the embeded icons<br>
+**/udpate** - checks the updates and install them if exists<br>
+**/{pic}.svg**- shows the embeded icons<br>
 **/{plugin}/** - starts the plugin<br>
