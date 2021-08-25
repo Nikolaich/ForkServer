@@ -2,18 +2,15 @@
 ForkServer for ForkPlayer<br>**(For testing purposes only!)**
 
 ### Run options:
-*program* **[command]** **[options]**<br>
-- where **[command]** (_for **windows** only, for other OS it is ignored_) is one of:<br>
-**install** - installs and runs it as service (service name: **ForkServer**)<br>
-**treeview** - sets the link to your media files folder (_in progress_, for now do it manually)<br>
-**uninstall** - stops and removes the service<br><br>
-- where **[options]** is a set of:<br>
+*program* **[options]**<br>
+Where **[options]** is a any set of:<br>
 **-a** [IP]{:PORT} - sets the address to listen http request to (default is :8027)<br>
 **-d** {wd_path} - sets the path to server's working dir (default is current working dir)<br>
 **-u** {number} - sets the period of {number} hours to automatically check for updates, 0 - means no autoupdates (default is 24)<br>
+**-n** {service_name} - sets service name (if it is not **ForkService**) for **windows only**, to restart it when updated<br>
 **-s** - sets to skip verify TLS certificates (can be usefull for slim and old OSes and routers)<br>
 **-t** - turns off timestamps in logs (useful for systemd logging, because it place timestamps)<br>
-**-i** - turns off info logging
+**-i** - turns off info logging (to reduce logging)
 
 *server logs errors to STDERR, info to STDOUT (**for windows service, it logs to the files: errors.log and info.log**)
 
