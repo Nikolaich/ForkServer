@@ -7,7 +7,7 @@ Where **[options]** is a any set of:<br>
 **-a** [IP]{:PORT} - sets the address to listen http request to (default is :8027)<br>
 **-d** {wd_path} - sets the path to server's working dir (default is current working dir)<br>
 **-u** {number} - sets the period of {number} hours to automatically check for updates, 0 - means no autoupdates (default is 24)<br>
-**-n** {service_name} - sets service name (if it is not **ForkService**) for **windows only**, to restart it when updated<br>
+**-n** {service_name} - sets the service name for the server (if it is not **ForkServer**) for **Windows only**, to restart it when updated<br>
 **-s** - sets to skip verify TLS certificates (can be usefull for slim and old OSes and routers)<br>
 **-t** - turns off timestamps in logs (useful for systemd logging, because it place timestamps)<br>
 **-i** - turns off info logging (to reduce logging)
