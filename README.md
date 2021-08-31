@@ -9,7 +9,6 @@ Where **[options]** is a any set of:<br>
 **-u** {number} - sets the period of {number} hours to automatically check for updates, 0 - means no autoupdates (default is 24)<br>
 **-n** {service_name} - sets the service name for the server for **Windows only**, to restart it when updated (default is **ForkServer**)<br>
 **-s** - sets to skip verify TLS certificates (can be usefull for slim and old OSes and routers)<br>
-**-t** - turns off timestamps in logs (useful for systemd logging, because it place timestamps)<br>
 **-i** - turns off info logging (to reduce logging)
 
 *server logs errors to STDERR, info to STDOUT (**for windows service, it logs to the files: errors.log and info.log**)
@@ -17,7 +16,7 @@ Where **[options]** is a any set of:<br>
 ### HTTP API:
 http://{ServerIP}:{ServerPort}**[/path]**
 - where **[/paht]** can be one of:<br>
-**/** - web ui (*in progress*)<br>
+**/** - web ui<br>
 **/test** - used by ForkPlayer testing the server<br>
 **/test.json** - stata in json-format<br>
 **/parserlink?{parsing_command}** - used by ForkPlayer parsing<br>
@@ -28,5 +27,6 @@ http://{ServerIP}:{ServerPort}**[/path]**
 **/set?Torrserve=search&search={addr}** - sets Torrserve address<br>
 **/restart** - restarts the server<br>
 **/udpate** - checks the updates and install them if exists<br>
+**/gc** - run garbage collector (memory cleaning)<br>
 **/{pic}.svg**- shows the embeded icons<br>
 **/{plugin}/** - starts the plugin<br>
