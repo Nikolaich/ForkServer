@@ -15,7 +15,7 @@ Where **[options]** is a any set of:<br>
 
 ### HTTP API:
 http://{ServerIP}:{ServerPort}**[/path]**
-- where **[/paht]** can be one of:<br>
+where **[/paht]** can be one of:<br>
 **/** - web ui<br>
 **/test** - used by ForkPlayer testing the server<br>
 **/test.json** - stata in json-format<br>
