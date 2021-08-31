@@ -2,62 +2,53 @@ package main
 
 import (
 	"ForkServer/server"
-	"io/ioutil"
+	"log"
 	"os"
 	"strconv"
 	"time"
 )
 
-var serve = func(svn string, dbg bool) {
-	var e error
-	if e = server.Init(); e == nil {
-		e = server.Run()
+var runService = runSTD
+
+func runSTD(sn, la, wd string, li bool) {
+	log.SetPrefix("Err: ")
+	server.Error = log.Println
+	server.Warning = log.New(os.Stderr, "Wrn: ", log.Flags()).Println
+	if li {
+		server.Info = log.New(os.Stdout, "Inf: ", log.Flags()).Println
 	}
-	if e != nil {
-		server.Err.Fatalln(e)
+	if e := server.Run(la, wd); e != nil {
+		log.Fatalln(e)
 	}
 }
-
 func main() {
-	var e error
-	if server.Executable, e = os.Executable(); e != nil {
-		server.Err.Fatalln(e)
-	}
-	svn, dbg := server.Name, true
-	if len(os.Args) > 0 {
+	li, wd, la, sn := true, "", "", server.Name
+	if len(os.Args) > 1 {
 		o := ""
-		for _, a := range os.Args[1:] {
-			if o == "" {
+		for _, a := range os.Args {
+			switch o {
+			case "-a":
+				la, o = a, ""
+			case "-d":
+				wd, o = a, ""
+			case "-n":
+				sn, o = a, ""
+			case "-u":
+				o = ""
+				if h, e := strconv.Atoi(a); e == nil {
+					server.Update = time.Hour * time.Duration(h)
+				}
+			default:
 				switch a {
 				case "-a", "-d", "-u", "-n":
 					o = a
 				case "-s":
 					server.SkipVerifyTLS = true
-				case "-t":
-					server.Err.SetFlags(0)
-					server.Wrn.SetFlags(0)
-					server.Inf.SetFlags(0)
 				case "-i":
-					server.Inf.SetOutput(ioutil.Discard)
-					dbg = false
+					li = false
 				}
-			} else {
-				switch o {
-				case "-a":
-					server.Addr = a
-				case "-d":
-					if e = os.Chdir(a); e != nil {
-						server.Err.Fatalln(e)
-					}
-				case "-u":
-					u, _ := strconv.Atoi(a)
-					server.Update = time.Duration(u) * time.Hour
-				case "-n":
-					svn = a
-				}
-				o = ""
 			}
 		}
 	}
-	serve(svn, dbg)
+	runService(sn, la, wd, li)
 }

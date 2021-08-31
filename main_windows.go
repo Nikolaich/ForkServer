@@ -2,63 +2,75 @@ package main
 
 import (
 	"ForkServer/server"
-	"os"
+	"fmt"
+	"log"
 	"os/exec"
 
-	"github.com/judwhite/go-svc"
+	"golang.org/x/sys/windows/svc"
+	"golang.org/x/sys/windows/svc/eventlog"
 )
 
 type service struct {
-	Name  string
-	Debug bool
-	Files []*os.File
+	Name, WD, Addr string
+	Log            *eventlog.Log
+	Err            chan error
 }
 
 func init() {
-	serve = func(svn string, dbg bool) {
-		s := &service{svn, dbg, nil}
-		if e := svc.Run(s); e != nil {
-			s.close(e)
+	runService = func(sn, la, wd string, li bool) {
+		if is, e := svc.IsWindowsService(); e != nil {
+			log.Fatalln(e)
+		} else if !is {
+			runSTD(sn, la, wd, li)
+		} else if lg, e := eventlog.Open(server.Name); e != nil {
+			log.Fatalln(e)
+		} else {
+			s := &service{sn, wd, la, lg, make(chan error)}
+			if li {
+				server.Info = s.inf
+			}
+			svc.Run(s.Name, s)
 		}
 	}
 }
-func (s *service) Init(env svc.Environment) (e error) {
-	if env.IsWindowsService() {
-		var f *os.File
-		server.Restart = s.restart
-		if f, e = os.Create("errors.log"); e == nil {
-			s.Files = append(s.Files, f)
-			server.Err.SetOutput(s.Files[0])
-			server.Wrn.SetOutput(s.Files[0])
-			if s.Debug {
-				if f, e = os.Create("info.log"); e == nil {
-					s.Files = append(s.Files, f)
-					server.Inf.SetOutput(s.Files[1])
+
+func (s *service) Execute(args []string, r <-chan svc.ChangeRequest, changes chan<- svc.Status) (bool, uint32) {
+	changes <- svc.Status{State: svc.StartPending}
+	server.Error = s.err
+	server.Warning = s.wrn
+	server.Restart = s.restart
+	go func() { s.Err <- server.Run(s.Addr, s.WD) }()
+	changes <- svc.Status{State: svc.Running, Accepts: svc.AcceptStop | svc.AcceptShutdown}
+	for {
+		select {
+		case e := <-s.Err:
+			if e != nil {
+				s.err(e)
+				return true, 1
+			}
+			return false, 0
+		case c := <-r:
+			switch c.Cmd {
+			case svc.Interrogate:
+				changes <- c.CurrentStatus
+			case svc.Stop, svc.Shutdown:
+				changes <- svc.Status{State: svc.StopPending}
+				if e := server.Stop(); e != nil {
+					s.err(e)
+					return true, 2
 				}
+				return false, 0
+			default:
+				s.Log.Error(1, fmt.Sprintf("unexpected windows control request #%d", c))
 			}
 		}
 	}
-	return
 }
-func (s *service) Start() (e error) {
-	if e = server.Init(); e == nil {
-		go s.close(server.Run())
-	}
-	return
-}
-func (s *service) Stop() error {
-	return server.Stop()
-}
-func (s *service) close(e error) {
-	for _, f := range s.Files {
-		f.Close()
-	}
-	if e != nil {
-		server.Err.Fatalln(e)
-	}
-}
+func (s *service) err(v ...interface{}) { s.Log.Error(1, fmt.Sprint(v...)) }
+func (s *service) wrn(v ...interface{}) { s.Log.Warning(1, fmt.Sprint(v...)) }
+func (s *service) inf(v ...interface{}) { s.Log.Info(1, fmt.Sprint(v...)) }
 func (s *service) restart() {
-	if e := exec.Command("cmd.exe", "/C", "net stop "+s.Name+" && net start "+s.Name).Start(); e != nil {
-		server.Err.Println(e)
+	if e := exec.Command("cmd", "/C", "net stop "+s.Name+" && net start "+s.Name).Start(); e != nil {
+		s.err(e)
 	}
 }

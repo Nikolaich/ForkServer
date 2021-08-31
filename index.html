@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>ForkServer</title>
+    <link rel="shortcut icon" href="/ogl.svg" type="image/svg+xml">
+    <style>
+        body    {margin: 1em auto 1em auto; width: max-content; background: black; color: white; font-family: Arial, Helvetica, sans-serif; font-size: 14pt;}
+        table   {border: 1px solid slategray; width: min-content;}
+        caption {padding: .5em; font-size: larger; background: slategray;text-align: left;}
+        button  {float:right;}
+        thead th, tfoot th{text-align: left; background: darkslategray; padding: .3em;}
+        thead td, tbody td, caption {white-space: nowrap;}
+        td:nth-child(2) {text-align: right;}
+        #PlugsTag:empty{display: none;}
+        #PlugsTag::before {content: " v. ";}
+        #Alloc::after,#Sys::after {content: " КБ";}
+        [id]:empty {color: salmon}
+        [id]:empty::after {content: "Не установлено!";}
+        img {height:2em; vertical-align: middle;}
+        a:link, a:visited {color:lime; text-decoration: none;}
+        a:hover, a:active {text-decoration: underline;}
+    </style>
+    <script>
+        function $(s,f){
+            if(typeof f=="function") document.querySelectorAll(s).forEach(f);
+            else{
+                q = document.querySelector(s);
+                if(typeof f=="string") q.innerHTML = f;
+                else if(typeof f=="boolean") q.hidden = !f;
+                return q;
+            }
+        }
+        function $$(u,f){
+            $("button",(e)=>{e.disabled=true});
+            var x = new XMLHttpRequest();
+            x.responseType = typeof f == "function" ? "json" : "text"
+            x.onload = function(){
+                switch(typeof f){
+                    case "function": f(this.response); break;
+                    case "string": rf(f); break;
+                    default: rf(); break;
+                }
+            };
+            x.onerror = function(){document.body.innerHTML = "<h1>ERROR!</h1>"};
+            x.onloadend = function(){$("button",(e)=>{e.disabled=false});}
+            x.open("GET", u)
+            x.send();
+        }
+        function rf(m) {if(m) alert(m); window.location.reload();}
+        function got(d){
+            $("#IP", window.location.host);
+            ["Name","Version","OS","Arch","Torrserve","PlugsTag", "WD"].forEach(k=>{if(d[k]) $("#"+k, d[k])});
+            $("#Up", d.Up.replace("h", "ч., ").replace("m", "м., ").replace("s", "с."));
+            if(d.Treeview) $("#Treeview", "Подключено");
+            d.Memory.Alloc = Math.round(d.Memory.Alloc / 1024);
+            d.Memory.Sys = Math.round(d.Memory.Sys / 1024);
+            $("#Alloc", d.Memory.Alloc.toLocaleString());
+            $("#Sys", d.Memory.Sys.toLocaleString());
+            if(d.Plugins) $("tbody", Object.keys(d.Plugins).map(k => 
+                "<tr><td><img src='/"+ (d.Plugins[k].Icon ? (k+"/"+d.Plugins[k].Icon) : "fr.svg") +"'> "+d.Plugins[k].Title+"</td><td>"
+                + (d.Plugins[k].HTML ? ("<a href='/" + k + "/" + d.Plugins[k].HTML + "' title='Перейти к настройкам'>") : "")
+                + "/"+k+"/" + (d.Plugins[k].HTML ? "</a>" : "") + "</td></tr>"
+            ).join("") || "<tr><th colspan='2'>Нет плагинов!</th></tr>");
+            if(d.Arch != "windows") d.Arch = "posix"
+            $("[lang]", e=>{e.hidden = e.lang != d.Arch});
+            if(d.HasUpdates && confirm("Есть обновления! Обновить сейчас?")) $$('/update?w_lang=ru',(d)=>{rf(d.notify)});
+        }
+    </script>
+</head>
+
+<body onload="$$('test.json',got)">
+    <table>
+        <caption>
+            <b id="Name"></b> v. <span id="Version"></span>
+            <button onclick="$$('/update?w_lang=ru',(d)=>{rf(d.notify)})" title="Проверить обновления">Обновление</button>
+        </caption>
+        <thead>
+            <tr><th colspan="2">Сервер:<button onclick="$$('/restart','Перезапуск запущен! Подождите пару секунд...')" title="Перезапустить ForkServer">Перезапуск</button></th></tr>
+            <tr><td>Работает:</td><td id="Up"></td></tr>
+            <tr><td>Платформа:</td><td><span id="OS"></span>/<span id="Arch"></span></td></tr>
+            <tr><th colspan="2">Занято памяти:<button onclick="$$('/gc')" title='Запустить "сборщик мусора"''>Отчистка</button></th></tr>
+            <tr><td>Используется:</td><td id="Alloc"></td></tr>
+            <tr><td>Выделено системой:</td><td id="Sys"></td></tr>
+            <tr><th colspan="2">Настройки:</th></tr>
+            <tr><td><a href="#HowTo" title="Подсказка">Адрес Torrserve*</a>:</td><td id="Torrserve"></td></tr>
+            <tr><td><a href="#HowTo" title="Подсказка">Мои медиафайлы**</a>:</td><td id="Treeview"></td></tr>
+            <tr><th colspan="2">Плагины<span id="PlugsTag"></span>:</th></tr>
+        </thead>
+        <tbody></tbody>
+        <tfoot style="font-size: smaller;">
+            <tr><th colspan="2" id="HowTo">Подсказки:</th></tr>
+            <tr><td colspan="2">
+                Для подключения ForkServer к ForkPlayer, в ForkPlayer зайдите в <b>Настройки приложения</b> 
+                (<i>Красная кнопка - Настройки - Настройки приложения</i>), там в поле <b>LOCAL_IP RemoteFork</b>
+                введите вручную адрес ForkServer: <b id="IP"></b>
+            </td></tr>
+            <tr><td colspan="2">
+                * Для подключения ForkServer к Torrserve, в ForkPlayer с главного меню (<i>Синяя кнопка</i>) зайдите в 
+                "<b>RemoteFork DLNA & Plugins</b>", а там в "<b>Torrserve</b>", если адрес Torrserve не определился автоматически,
+                то введите его нажав вверху на <b>Torrserve</b>
+            </td></tr>
+            <tr><td colspan="2">
+                ** Для подключения своей папки с медиафайлами, на машине, где запущен ForkServer
+                <span lang="windows">запустите <b>cmd</b> от имени администратора и там запустите команду:</span>
+                <span lang="posix">откройте терминал и запустите команду:</span><br>
+                <span style="white-space: nowrap;">
+                    <b lang="windows">mklink /D "</b><b lang="posix">ln -s "{<i>папка</i>}" "</b><b id="WD"></b><b lang="windows">\treeview" "{<i>папка</i>}"</b><b lang="posix">/treeview"</b>
+                </span>
+            </td></tr>
+        </tfoot>
+    </table>
+</body>
+
+</html>

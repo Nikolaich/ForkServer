@@ -5,7 +5,7 @@ Name=ForkServer
 
 echo "package server" > server/version.go
 echo "const Name, Vers = \"$Name\", \"$Vers\"" >> server/version.go
-
+gzip -c index.html > server/index.html.gz
 PLATFORMS=(
     'linux/arm'
     'linux/amd64'
@@ -31,3 +31,7 @@ for PLATFORM in "${PLATFORMS[@]}"; do
     fi
     echo "done!"
 done
+echo -ne "@echo off\nsetlocal\nset Name=$Name\nset Vers=$Vers\n" > distribs/install.bat
+cat installers/install.bat >> distribs/install.bat
+echo -ne "@echo off\nsetlocal\nset Name=$Name\n" > distribs/manage.bat
+cat installers/manage.bat >> distribs/manage.bat
