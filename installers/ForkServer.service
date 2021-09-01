@@ -1,0 +1,12 @@
+[Unit]
+Description=ForkServer for ForkPlayer
+Requires=network.target
+After=network-online.target syslog.target
+
+[Service]
+Type=simple
+ExecStart=/opt/ForkServer/ForkServer -i
+Restart=on-success
+
+[Install]
+WantedBy=multi-user.target
