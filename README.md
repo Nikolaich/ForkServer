@@ -3,7 +3,8 @@ ForkServer is a program for ForkPlayer support (ex. RemoteFork). General purpose
 - preser support (ForkPlayer embeded functionality)
 - view and play media files form your server/computer
 - view and play torrent files (additional software needed, e.g. Torrserver) 
-- plugins system to extend functionality like IPTV, movies from the internet, etc (can be writen by yourself).<br>See preinstalled plugins https://github.com/damiva/ForkServerPlugs
+- plugins system to extend functionality like IPTV, movies from the internet, etc (can be writen by yourself).<br>
+- See preinstalled plugins: https://github.com/damiva/ForkServerPlugs
 ## Usage
 ### Run as a program
 Download the applicable file from https://github.com/damiva/ForkServer/Releases to a it's working directory and execute it.<br>
@@ -20,20 +21,20 @@ ForkServer **[-a [IP]{:PORT}] [-d {WD_PATH}] [-u {NUMBER}] [-n {SERVICE_NAME}] [
 Server logs errors and warnings to STDERR, info to STDOUT (**as Windows service, it logs to standard Windows event log**)
 ### Install as a service
 #### Windows
-1. Create folder "**C:\Program Files\ForkServer**"
+1. Create folder "**C:\ForkServer**"
 2. Download file **ForkServer-windows-*** for your architecture to the folder
 3. Rename downloaded file to **ForkServer.exe**
 4. To register and run the service: open **cmd** as Administrator and run the following three commands:<br>
-`sc create ForkServer binpath= "C:\ForkServer\ForkServer.exe -i" start= auto DisplayName= ForkServer`<br>
-`sc description ForkServer "ForkServer for ForkPlayer"`<br>
-`net start ForkServer`
+>`sc create ForkServer binpath= "C:\ForkServer\ForkServer.exe -i" start= auto DisplayName= ForkServer`<br>
+>`sc description ForkServer "ForkServer for ForkPlayer"`<br>
+>`net start ForkServer`
 #### Linux with systemd
-1. Create folder **/opt/ForkServer**<br>`# mkdir /opt/ForkServer`
+1. Create folder **/opt/ForkServer**<br>#`mkdir /opt/ForkServer`
 2. Download file **ForkServer-linux-*** for your architecture to the folder under name **ForkServer**<br>
-`# curl -o /opt/ForkServer/ForkServer https://github.com/damiva/ForkServer/releases/download/0.08/ForkServer-linux-*`
+#`curl -o /opt/ForkServer/ForkServer https://github.com/damiva/ForkServer/releases/download/0.08/ForkServer-linux-*`
 3. Download file **ForkServer.service** to the folder **/etc/systemd/system/**<br>
-`# curl -o /etc/systemd/system/ForkServer.service https://github.com/damiva/ForkServer/releases/download/0.08/ForkServer.service`
-4. Install and run the service<br>`# systemctl enable ForkServer`<br>`# dydtemctl start ForkServer`
+#`curl -o /etc/systemd/system/ForkServer.service https://github.com/damiva/ForkServer/releases/download/0.08/ForkServer.service`
+4. Install and run the service<br>#`systemctl enable ForkServer`<br>#`dydtemctl start ForkServer`
 #### Mac OS X
 *in progress*
 ## HTTP API:
