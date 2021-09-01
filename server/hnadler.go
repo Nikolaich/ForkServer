@@ -13,7 +13,7 @@ import (
 
 type pluginfo struct{ Title, Icon, Default, HTML string }
 
-const extTengo, pthManifest, pthWebUI = ".tengo", "manifest.json", "index.html"
+const extTengo, pthManifest = ".tengo", "manifest.json"
 
 //go:embed index.html.gz
 var indexHTML []byte

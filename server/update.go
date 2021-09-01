@@ -75,9 +75,6 @@ func extractPlugins(n string, clean bool) (e error) {
 					case tar.TypeDir:
 						e = os.MkdirAll(filepath.Join(pthPlugs, p[1]), 0777)
 					case tar.TypeReg:
-						if p[1] != pthWebUI {
-							p[1] = filepath.Join(pthPlugs, p[1])
-						}
 						if i, e := os.Create(p[1]); e == nil {
 							_, e = io.Copy(i, t)
 							i.Close()
