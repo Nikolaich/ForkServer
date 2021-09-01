@@ -2,6 +2,7 @@ package server
 
 import (
 	"archive/tar"
+	"bytes"
 	"compress/gzip"
 	"encoding/json"
 	"errors"
@@ -17,6 +18,7 @@ import (
 
 type gitinfo struct {
 	T string `json:"tag_name"`
+	N string `json:"name"`
 	U string `json:"tarball_url"`
 	A []struct {
 		N string `json:"name"`
@@ -24,7 +26,7 @@ type gitinfo struct {
 	} `json:"assets"`
 }
 
-const gitFS, gitPlugs, tmpPlugins = "damiva/ForkServer", "damiva/ForkServerPlugs", "plugins.tar.gz"
+const gitFS, gitPlugs, tmpPlugins, clearINI = "damiva/ForkServer", "damiva/ForkServerPlugs", "plugins.tar.gz", "clear.ini"
 
 var instaNew bool
 
@@ -59,25 +61,48 @@ func download(src, dst string) (e error) {
 	}
 	return
 }
-func extractPlugins(n string, clean bool) (e error) {
+func extractPlugins(n string) (e error) {
 	if f, e := os.Open(n); e == nil {
 		defer f.Close()
 		if z, e := gzip.NewReader(f); e == nil {
 			defer z.Close()
 			var h *tar.Header
-			if clean {
-				os.RemoveAll(pthPlugs)
-			}
 			t := tar.NewReader(z)
+			for h, e = t.Next(); e == nil; h, e = t.Next() {
+				if p := strings.SplitN(h.Name, "/", 2); h.Typeflag == tar.TypeReg && len(p) == 2 && p[1] == clearINI {
+					var b []byte
+					if i, e := t.Read(b); e != nil {
+						Error("Reading", tmpPlugins, ", file", h.Name, "error:", e)
+					} else if i > 0 {
+						for _, n := range bytes.Split(b, []byte{'\n'}) {
+							fn := strings.TrimSpace(string(n))
+							if i, e := os.Stat(fn); e != nil {
+								Info("Clearing plugins error:", e)
+							} else if i.IsDir() {
+								if e = os.RemoveAll(fn); e != nil {
+									Info("Clearing plugins error:", e)
+								}
+							} else if e = os.Remove(fn); e != nil {
+								Info("Clearing plugins error:", e)
+							}
+						}
+					}
+					e = nil
+					break
+				}
+			}
+			t = tar.NewReader(z)
 			for h, e = t.Next(); e == nil; h, e = t.Next() {
 				if p := strings.SplitN(h.Name, "/", 2); len(p) == 2 {
 					switch h.Typeflag {
 					case tar.TypeDir:
 						e = os.MkdirAll(filepath.Join(pthPlugs, p[1]), 0777)
 					case tar.TypeReg:
-						if i, e := os.Create(p[1]); e == nil {
-							_, e = io.Copy(i, t)
-							i.Close()
+						if p[1] != clearINI {
+							if i, e := os.Create(p[1]); e == nil {
+								_, e = io.Copy(i, t)
+								i.Close()
+							}
 						}
 					}
 				}
@@ -129,11 +154,13 @@ func updatePS(justCheck bool) (nv bool) {
 		Error(t, e)
 	} else if nv = i.U != "" && i.T != "" && i.T != sets.PlugsTag; !nv {
 		Info(t, "there is no update.")
+	} else if nm := strings.Split(i.N, " "); strings.TrimSuffix(nm[len(nm)-1], "+") > Vers {
+		Info(t, "there is no update for your ForkServer version.")
 	} else if justCheck {
 		return
 	} else if e = download(i.U, tmpPlugins); e != nil {
 		Error(e)
-	} else if e = extractPlugins(tmpPlugins, strings.HasSuffix(i.T, "a")); e != nil {
+	} else if e = extractPlugins(tmpPlugins); e != nil {
 		Error(e)
 		rm = true
 	} else {

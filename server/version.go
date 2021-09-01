@@ -1,2 +1,2 @@
 package server
-const Name, Vers = "ForkServer", "0.08"
+const Name, Vers = "ForkServer", "0.09"

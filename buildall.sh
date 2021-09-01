@@ -35,3 +35,4 @@ echo -ne "@echo off\nsetlocal\nset Name=$Name\nset Vers=$Vers\n" > distribs/inst
 cat installers/install.bat >> distribs/install.bat
 echo -ne "@echo off\nsetlocal\nset Name=$Name\n" > distribs/manage.bat
 cat installers/manage.bat >> distribs/manage.bat
+cp installers/ForkServer.service distribs
