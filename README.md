@@ -25,9 +25,9 @@ Server logs errors and warnings to STDERR, info to STDOUT (**as Windows service,
 2. Download file **ForkServer-windows-*** for your architecture to the folder
 3. Rename downloaded file to **ForkServer.exe**
 4. To register and run the service: open **cmd** as Administrator and run the following three commands:<br>
->`sc create ForkServer binpath= "C:\ForkServer\ForkServer.exe -i" start= auto DisplayName= ForkServer`<br>
->`sc description ForkServer "ForkServer for ForkPlayer"`<br>
->`net start ForkServer`
+- `sc create ForkServer binpath= "C:\ForkServer\ForkServer.exe -i" start= auto DisplayName= ForkServer`<br>
+- `sc description ForkServer "ForkServer for ForkPlayer"`<br>
+- `net start ForkServer`
 #### Linux with systemd
 1. Create folder **/opt/ForkServer**<br>#`mkdir /opt/ForkServer`
 2. Download file **ForkServer-linux-*** for your architecture to the folder under name **ForkServer**<br>
